@@ -4,14 +4,20 @@ import (
 	"context"
 	userv1 "github.com/gorobot-nz/test-task/gen/proto/user/v1"
 	"github.com/gorobot-nz/test-task/pkg/storage"
+	"go.uber.org/zap"
 )
 
 type StorageRepository struct {
 	storage *storage.Storage[*userv1.User]
+
+	logger *zap.Logger
 }
 
-func NewStorageRepository() *StorageRepository {
-	return &StorageRepository{storage: storage.NewStorage[*userv1.User]()}
+func NewStorageRepository(logger *zap.Logger) *StorageRepository {
+	return &StorageRepository{
+		logger:  logger,
+		storage: storage.NewStorage[*userv1.User](),
+	}
 }
 
 func (s *StorageRepository) NewUser(ctx context.Context, user *userv1.User) (string, error) {

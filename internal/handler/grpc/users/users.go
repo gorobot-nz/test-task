@@ -3,6 +3,7 @@ package users
 import (
 	"context"
 	userv1 "github.com/gorobot-nz/test-task/gen/proto/user/v1"
+	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -20,10 +21,13 @@ type Handler struct {
 	userv1.UnimplementedUserServiceServer
 
 	service Service
+
+	logger *zap.Logger
 }
 
-func NewHandler(service Service) *Handler {
+func NewHandler(logger *zap.Logger, service Service) *Handler {
 	return &Handler{
+		logger:  logger,
 		service: service,
 	}
 }

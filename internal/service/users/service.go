@@ -3,6 +3,7 @@ package users
 import (
 	"context"
 	userv1 "github.com/gorobot-nz/test-task/gen/proto/user/v1"
+	"go.uber.org/zap"
 )
 
 type Repository interface {
@@ -16,10 +17,13 @@ type Repository interface {
 
 type Service struct {
 	repository Repository
+
+	logger *zap.Logger
 }
 
-func NewService(repository Repository) *Service {
+func NewService(logger *zap.Logger, repository Repository) *Service {
 	return &Service{
+		logger:     logger,
 		repository: repository,
 	}
 }
