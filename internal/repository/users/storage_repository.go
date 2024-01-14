@@ -20,32 +20,27 @@ func NewStorageRepository(logger *zap.Logger) *StorageRepository {
 	}
 }
 
-func (s *StorageRepository) NewUser(ctx context.Context, user *userv1.User) (string, error) {
+func (s StorageRepository) Create(ctx context.Context, user *userv1.User) (string, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s *StorageRepository) GetUsers(ctx context.Context, page, limit int32) ([]*userv1.User, error) {
+func (s StorageRepository) List(ctx context.Context, page, limit int32) ([]*userv1.User, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s *StorageRepository) GetUserById(ctx context.Context, id string) (*userv1.User, error) {
+func (s StorageRepository) GetById(ctx context.Context, id string) (*userv1.User, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s *StorageRepository) GetUserByUsername(ctx context.Context, username string) (*userv1.User, error) {
+func (s StorageRepository) Update(ctx context.Context, user *userv1.User) (*userv1.User, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s *StorageRepository) UpdateUser(ctx context.Context, user *userv1.User) (*userv1.User, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (s *StorageRepository) DeleteUser(ctx context.Context, id string) error {
+func (s StorageRepository) Delete(ctx context.Context, id string) error {
 	//TODO implement me
 	panic("implement me")
 }
