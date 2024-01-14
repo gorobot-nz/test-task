@@ -8,7 +8,6 @@ import (
 	"github.com/gorobot-nz/test-task/pkg/middleware"
 	"github.com/joho/godotenv"
 	"golang.org/x/crypto/bcrypt"
-	"io/fs"
 	"net"
 	"os"
 	"os/signal"
@@ -193,7 +192,7 @@ func (a *App) saveStore() {
 			a.logger.Error("Failed to marshal item", zap.Error(err))
 			return
 		}
-		err = os.WriteFile(file.Name(), marshal, fs.ModeAppend)
+		_, err = file.WriteString(fmt.Sprintf("%s\n", string(marshal)))
 		if err != nil {
 			a.logger.Error("Failed to write", zap.Error(err))
 			return

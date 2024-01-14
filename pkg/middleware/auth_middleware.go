@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	userv1 "github.com/gorobot-nz/test-task/gen/proto/user/v1"
-	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
+	grpcauth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -27,7 +27,7 @@ func AuthMiddleware() grpc.UnaryServerInterceptor {
 			return handler(ctx, req)
 		}
 
-		token, err := grpc_auth.AuthFromMD(ctx, "basic")
+		token, err := grpcauth.AuthFromMD(ctx, "basic")
 		if err != nil {
 			return nil, status.Error(codes.PermissionDenied, err.Error())
 		}
