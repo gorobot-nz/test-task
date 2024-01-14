@@ -18,6 +18,9 @@ var adminOnlyMethods = []string{
 	userv1.UserService_UpdateUser_FullMethodName,
 }
 
+const Username = "username"
+const Password = "password"
+
 func AuthMiddleware() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
 		if !slices.Contains(adminOnlyMethods, info.FullMethod) {
@@ -40,8 +43,8 @@ func AuthMiddleware() grpc.UnaryServerInterceptor {
 			return nil, status.Error(codes.PermissionDenied, err.Error())
 		}
 
-		ctx = context.WithValue(ctx, "username", split[0])
-		ctx = context.WithValue(ctx, "password", split[1])
+		ctx = context.WithValue(ctx, Username, split[0])
+		ctx = context.WithValue(ctx, Password, split[1])
 
 		return handler(ctx, req)
 	}

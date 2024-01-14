@@ -2,6 +2,8 @@ package users
 
 import (
 	"context"
+	"github.com/gorobot-nz/test-task/pkg/middleware"
+	"golang.org/x/crypto/bcrypt"
 
 	userv1 "github.com/gorobot-nz/test-task/gen/proto/user/v1"
 
@@ -38,6 +40,26 @@ func (h *Handler) NewUser(ctx context.Context, req *userv1.NewUserRequest) (*use
 	log := h.logger.Named("NewUser")
 
 	log.Debug("Request received", zap.Any("req", req))
+
+	username := ctx.Value(middleware.Username).(string)
+	password := ctx.Value(middleware.Password).(string)
+
+	u, err := h.service.GetUserByUsername(ctx, username)
+	if err != nil {
+		log.Error("Failed to get admin user", zap.Error(err))
+		return nil, err
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(u.GetPassword()), []byte(password))
+	if err != nil {
+		log.Error("Failed to verify password admin user", zap.Error(err))
+		return nil, err
+	}
+
+	if !u.GetAdmin() {
+		log.Error("Failed to verify admin status", zap.Error(err))
+		return nil, err
+	}
 
 	user := &userv1.User{
 		Email:    req.GetEmail(),
@@ -114,6 +136,26 @@ func (h *Handler) UpdateUser(ctx context.Context, req *userv1.UpdateUserRequest)
 
 	log.Debug("Request received", zap.Any("req", req))
 
+	username := ctx.Value(middleware.Username).(string)
+	password := ctx.Value(middleware.Password).(string)
+
+	u, err := h.service.GetUserByUsername(ctx, username)
+	if err != nil {
+		log.Error("Failed to get admin user", zap.Error(err))
+		return nil, err
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(u.GetPassword()), []byte(password))
+	if err != nil {
+		log.Error("Failed to verify password admin user", zap.Error(err))
+		return nil, err
+	}
+
+	if !u.GetAdmin() {
+		log.Error("Failed to verify admin status", zap.Error(err))
+		return nil, err
+	}
+
 	user := &userv1.User{
 		Id:       req.GetId(),
 		Email:    req.GetEmail(),
@@ -122,7 +164,7 @@ func (h *Handler) UpdateUser(ctx context.Context, req *userv1.UpdateUserRequest)
 		Admin:    req.GetAdmin(),
 	}
 
-	user, err := h.service.UpdateUser(ctx, user)
+	user, err = h.service.UpdateUser(ctx, user)
 	if err != nil {
 		log.Error("Failed to update user", zap.Error(err))
 		return nil, status.Error(codes.InvalidArgument, "Failed to update user")
@@ -136,7 +178,27 @@ func (h *Handler) DeleteUser(ctx context.Context, req *userv1.DeleteUserRequest)
 
 	log.Debug("Request received", zap.Any("req", req))
 
-	err := h.service.DeleteUser(ctx, req.GetId())
+	username := ctx.Value(middleware.Username).(string)
+	password := ctx.Value(middleware.Password).(string)
+
+	u, err := h.service.GetUserByUsername(ctx, username)
+	if err != nil {
+		log.Error("Failed to get admin user", zap.Error(err))
+		return nil, err
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(u.GetPassword()), []byte(password))
+	if err != nil {
+		log.Error("Failed to verify password admin user", zap.Error(err))
+		return nil, err
+	}
+
+	if !u.GetAdmin() {
+		log.Error("Failed to verify admin status", zap.Error(err))
+		return nil, err
+	}
+
+	err = h.service.DeleteUser(ctx, req.GetId())
 	if err != nil {
 		log.Error("Failed to delete user", zap.Error(err))
 		return nil, status.Error(codes.InvalidArgument, "Failed to delete user")
