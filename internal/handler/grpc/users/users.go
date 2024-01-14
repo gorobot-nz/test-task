@@ -47,18 +47,18 @@ func (h *Handler) NewUser(ctx context.Context, req *userv1.NewUserRequest) (*use
 	u, err := h.service.GetUserByUsername(ctx, username)
 	if err != nil {
 		log.Error("Failed to get admin user", zap.Error(err))
-		return nil, err
+		return nil, status.Error(codes.PermissionDenied, "Permission denied")
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(u.GetPassword()), []byte(password))
 	if err != nil {
 		log.Error("Failed to verify password admin user", zap.Error(err))
-		return nil, err
+		return nil, status.Error(codes.PermissionDenied, "Permission denied")
 	}
 
 	if !u.GetAdmin() {
 		log.Error("Failed to verify admin status", zap.Error(err))
-		return nil, err
+		return nil, status.Error(codes.PermissionDenied, "Permission denied")
 	}
 
 	user := &userv1.User{
@@ -142,18 +142,18 @@ func (h *Handler) UpdateUser(ctx context.Context, req *userv1.UpdateUserRequest)
 	u, err := h.service.GetUserByUsername(ctx, username)
 	if err != nil {
 		log.Error("Failed to get admin user", zap.Error(err))
-		return nil, err
+		return nil, status.Error(codes.PermissionDenied, "Permission denied")
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(u.GetPassword()), []byte(password))
 	if err != nil {
 		log.Error("Failed to verify password admin user", zap.Error(err))
-		return nil, err
+		return nil, status.Error(codes.PermissionDenied, "Permission denied")
 	}
 
 	if !u.GetAdmin() {
 		log.Error("Failed to verify admin status", zap.Error(err))
-		return nil, err
+		return nil, status.Error(codes.PermissionDenied, "Permission denied")
 	}
 
 	user := &userv1.User{
@@ -190,12 +190,17 @@ func (h *Handler) DeleteUser(ctx context.Context, req *userv1.DeleteUserRequest)
 	err = bcrypt.CompareHashAndPassword([]byte(u.GetPassword()), []byte(password))
 	if err != nil {
 		log.Error("Failed to verify password admin user", zap.Error(err))
-		return nil, err
+		return nil, status.Error(codes.PermissionDenied, "Permission denied")
 	}
 
 	if !u.GetAdmin() {
 		log.Error("Failed to verify admin status", zap.Error(err))
-		return nil, err
+		return nil, status.Error(codes.PermissionDenied, "Permission denied")
+	}
+
+	if u.GetId() == req.GetId() {
+		log.Error("Cannot delete yourself", zap.Error(err))
+		return nil, status.Error(codes.Aborted, "You can't delete yourself")
 	}
 
 	err = h.service.DeleteUser(ctx, req.GetId())
