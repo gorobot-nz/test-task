@@ -30,8 +30,10 @@ func (s *Storage[V]) Set(key string, value V) {
 	s.m.Unlock()
 }
 
-func (s *Storage[V]) Get(key string) V {
-	return s.storageMap[key]
+func (s *Storage[V]) Get(key string) (V, bool) {
+	val, ok := s.storageMap[key]
+
+	return val, ok
 }
 
 func (s *Storage[V]) List() []V {
@@ -50,7 +52,7 @@ func (s *Storage[V]) Delete(key string) {
 	s.m.Lock()
 	index := slices.Index(s.keysSlice, key)
 	if index != -1 {
-		slices.Delete(s.keysSlice, index, index+1)
+		s.keysSlice = slices.Delete(s.keysSlice, index, index+1)
 		delete(s.storageMap, key)
 	}
 	s.m.Unlock()
