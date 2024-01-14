@@ -130,7 +130,6 @@ func (a *App) initStore() {
 			Password: string(password),
 			Admin:    true,
 		})
-		return
 	} else {
 		defer func(file *os.File) {
 			err := file.Close()
@@ -149,6 +148,27 @@ func (a *App) initStore() {
 				a.logger.Fatal("Failed to load user", zap.Error(err))
 			}
 			a.store.Set(user.GetId(), user)
+		}
+
+		if a.store.Size() == 0 {
+			if adminEmail == "" || adminUsername == "" || adminPassword == "" {
+				a.logger.Fatal("No default admin params")
+			}
+
+			id := uuid.New().String()
+
+			password, err := bcrypt.GenerateFromPassword([]byte(adminPassword), 10)
+			if err != nil {
+				a.logger.Fatal("Failed to generate password", zap.Error(err))
+			}
+
+			a.store.Set(id, userv1.User{
+				Id:       id,
+				Email:    adminEmail,
+				Username: adminUsername,
+				Password: string(password),
+				Admin:    true,
+			})
 		}
 	}
 }
