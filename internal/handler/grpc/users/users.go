@@ -69,7 +69,7 @@ func (h *Handler) GetUsers(ctx context.Context, req *userv1.GetUsersRequest) (*u
 	}
 
 	if req.Limit != nil {
-		page = req.GetLimit()
+		limit = req.GetLimit()
 	}
 
 	users, err := h.service.GetUsers(ctx, page, limit)
