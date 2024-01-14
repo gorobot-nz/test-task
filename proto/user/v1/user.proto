@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+package user;
+
+message User {
+    string id = 1;
+    string email = 2;
+    string username = 3;
+    string password = 4;
+    bool admin = 5;
+}
+
+message NewUserRequest {
+    string email = 1;
+    string username = 2;
+    string password = 3;
+    bool admin = 4;
+}
+
+message NewUserResponse {
+    string id = 1;
+}
+
+message GetUsersRequest {
+    optional int32 page = 1;
+    optional int32 limit = 2;
+}
+
+message GetUsersResponse {
+    repeated User users = 1;
+}
+
+message GetUserByIdRequest {
+    string id = 1;
+}
+
+message GetUserByIdResponse {
+    User user = 1;
+}
+
+message GetUserByUsernameRequest {
+    string username = 1;
+}
+
+message GetUserByUsernameResponse {
+    User user = 1;
+}
+
+message UpdateUserRequest {
+    string id = 1;
+    optional string email = 2;
+    optional string username = 3;
+    optional string password = 4;
+    optional bool admin = 5;
+}
+
+message UpdateUserResponse {
+    User user = 1;
+}
+
+message DeleteUserRequest {
+    string id = 1;
+}
+
+message DeleteUserResponse {}
+
+service UserService {
+    rpc NewUser (NewUserRequest) returns (NewUserResponse);
+    rpc GetUsers (GetUsersRequest) returns (GetUsersResponse);
+    rpc GetUserById (GetUserByIdRequest) returns (GetUserByIdResponse);
+    rpc GetUserByUsername (GetUserByUsernameRequest) returns (GetUserByUsernameResponse);
+    rpc UpdateUser (UpdateUserRequest) returns (UpdateUserResponse);
+    rpc DeleteUser (DeleteUserRequest) returns (DeleteUserResponse);
+}
