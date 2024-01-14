@@ -31,8 +31,9 @@ func (s *Storage[V]) Set(key string, value V) {
 }
 
 func (s *Storage[V]) Get(key string) (V, bool) {
+	s.m.Lock()
 	val, ok := s.storageMap[key]
-
+	s.m.Unlock()
 	return val, ok
 }
 
@@ -56,4 +57,11 @@ func (s *Storage[V]) Delete(key string) {
 		delete(s.storageMap, key)
 	}
 	s.m.Unlock()
+}
+
+func (s *Storage[V]) Size() uint64 {
+	s.m.Lock()
+	var size = uint64(len(s.storageMap))
+	s.m.Unlock()
+	return size
 }
