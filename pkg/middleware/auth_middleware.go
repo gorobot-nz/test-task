@@ -37,7 +37,7 @@ func AuthMiddleware() grpc.UnaryServerInterceptor {
 			return nil, status.Error(codes.PermissionDenied, err.Error())
 		}
 
-		split := strings.Split(string(decodeString), ":")
+		split := strings.SplitN(string(decodeString), ":", 2)
 
 		if len(split) != 2 {
 			return nil, status.Error(codes.PermissionDenied, err.Error())
