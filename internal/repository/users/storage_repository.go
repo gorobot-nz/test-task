@@ -67,7 +67,7 @@ func (s *StorageRepository) List(ctx context.Context, page, limit int32) ([]*use
 		border = int32(len(resultList))
 	}
 
-	resultList = resultList[offset : offset+limit]
+	resultList = resultList[offset:border]
 
 	return resultList, nil
 }
