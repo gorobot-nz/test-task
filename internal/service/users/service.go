@@ -123,12 +123,22 @@ func (s *Service) UpdateUser(ctx context.Context, user *userv1.User) (*userv1.Us
 		return nil, errors.New("failure mail validation")
 	}
 
-	if !validation.IsValidPassword(user.GetPassword()) {
+	if user.GetPassword() != "" && !validation.IsValidPassword(user.GetPassword()) {
 		return nil, errors.New("failure password validation")
 	}
 
 	if !validation.IsValidUsername(user.GetUsername()) {
 		return nil, errors.New("failure username validation")
+	}
+
+	if user.GetPassword() != "" {
+		password, err := bcrypt.GenerateFromPassword([]byte(user.GetPassword()), 10)
+		if err != nil {
+			log.Error("Failed to generate password", zap.Error(err))
+			return nil, err
+		}
+
+		user.Password = string(password)
 	}
 
 	updatedUser, err := s.repository.Update(ctx, user)

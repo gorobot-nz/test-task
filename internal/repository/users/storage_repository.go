@@ -87,7 +87,13 @@ func (s *StorageRepository) GetById(ctx context.Context, id string) (*userv1.Use
 func (s *StorageRepository) Update(ctx context.Context, user *userv1.User) (*userv1.User, error) {
 	_ = s.logger.Named("Update")
 
-	_, ok := s.store.Get(user.GetId())
+	getUser, ok := s.store.Get(user.GetId())
+
+	var password = getUser.GetPassword()
+
+	if user.GetPassword() != "" {
+		password = user.GetPassword()
+	}
 
 	if !ok {
 		return nil, errors.New("no such user")
@@ -97,7 +103,7 @@ func (s *StorageRepository) Update(ctx context.Context, user *userv1.User) (*use
 		Id:       user.GetId(),
 		Email:    user.GetEmail(),
 		Username: user.GetEmail(),
-		Password: user.GetPassword(),
+		Password: password,
 		Admin:    user.GetAdmin(),
 	})
 
