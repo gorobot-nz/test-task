@@ -13,15 +13,15 @@ import (
 )
 
 type StorageRepository struct {
-	storage *storage.Storage[userv1.User]
+	store *storage.Storage[userv1.User]
 
 	logger *zap.Logger
 }
 
-func NewStorageRepository(logger *zap.Logger) *StorageRepository {
+func NewStorageRepository(logger *zap.Logger, store *storage.Storage[userv1.User]) *StorageRepository {
 	return &StorageRepository{
-		logger:  logger,
-		storage: storage.NewStorage[userv1.User](),
+		logger: logger,
+		store:  store,
 	}
 }
 
@@ -30,7 +30,7 @@ func (s *StorageRepository) Create(ctx context.Context, user *userv1.User) (stri
 
 	user.Id = uuid.New().String()
 
-	s.storage.Set(user.GetId(), userv1.User{
+	s.store.Set(user.GetId(), userv1.User{
 		Id:       user.GetId(),
 		Email:    user.GetEmail(),
 		Username: user.GetEmail(),
@@ -44,7 +44,7 @@ func (s *StorageRepository) Create(ctx context.Context, user *userv1.User) (stri
 func (s *StorageRepository) List(ctx context.Context, page, limit int32) ([]*userv1.User, error) {
 	_ = s.logger.Named("List")
 
-	list := s.storage.List()
+	list := s.store.List()
 
 	resultList := make([]*userv1.User, len(list))
 
@@ -75,7 +75,7 @@ func (s *StorageRepository) List(ctx context.Context, page, limit int32) ([]*use
 func (s *StorageRepository) GetById(ctx context.Context, id string) (*userv1.User, error) {
 	_ = s.logger.Named("GetById")
 
-	get, ok := s.storage.Get(id)
+	get, ok := s.store.Get(id)
 
 	if !ok {
 		return nil, errors.New("no such user")
@@ -87,13 +87,13 @@ func (s *StorageRepository) GetById(ctx context.Context, id string) (*userv1.Use
 func (s *StorageRepository) Update(ctx context.Context, user *userv1.User) (*userv1.User, error) {
 	_ = s.logger.Named("Update")
 
-	_, ok := s.storage.Get(user.GetId())
+	_, ok := s.store.Get(user.GetId())
 
 	if !ok {
 		return nil, errors.New("no such user")
 	}
 
-	s.storage.Set(user.GetId(), userv1.User{
+	s.store.Set(user.GetId(), userv1.User{
 		Id:       user.GetId(),
 		Email:    user.GetEmail(),
 		Username: user.GetEmail(),
@@ -107,12 +107,12 @@ func (s *StorageRepository) Update(ctx context.Context, user *userv1.User) (*use
 func (s *StorageRepository) Delete(ctx context.Context, id string) error {
 	_ = s.logger.Named("Delete")
 
-	_, ok := s.storage.Get(id)
+	_, ok := s.store.Get(id)
 
 	if !ok {
 		return errors.New("no such user")
 	}
-	s.storage.Delete(id)
+	s.store.Delete(id)
 
 	return nil
 }
