@@ -103,10 +103,9 @@ func (a *App) Run() {
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, syscall.SIGTERM, syscall.SIGINT)
 	<-stop
+	a.saveStore()
 
 	a.s.GracefulStop()
-
-	a.saveStore()
 }
 
 func (a *App) initStore() {
