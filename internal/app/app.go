@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/google/uuid"
+	"github.com/gorobot-nz/test-task/pkg/middleware"
 	"github.com/joho/godotenv"
 	"golang.org/x/crypto/bcrypt"
 	"io/fs"
@@ -73,6 +74,7 @@ func NewApp() *App {
 	server := grpc.NewServer(grpc.UnaryInterceptor(
 		grpcmiddleware.ChainUnaryServer(
 			grpczap.UnaryServerInterceptor(logger),
+			middleware.AuthMiddleware(),
 		),
 	))
 
